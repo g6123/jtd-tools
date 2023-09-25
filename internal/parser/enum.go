@@ -3,7 +3,8 @@ package parser
 import "github.com/valyala/fastjson"
 
 type EnumNode struct {
-	Cases []string
+	Cases    []string
+	Nullable bool
 
 	metadata *fastjson.Object
 }
@@ -14,6 +15,7 @@ func IsEnum(def *fastjson.Value) bool {
 
 func ParseEnum(def *fastjson.Value) (EnumNode, error) {
 	node := EnumNode{
+		Nullable: def.GetBool("nullable"),
 		metadata: def.GetObject("metadata"),
 	}
 

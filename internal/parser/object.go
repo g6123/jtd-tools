@@ -7,6 +7,7 @@ import (
 
 type ObjectNode struct {
 	Properties []ObjectPropertyNode
+	Nullable   bool
 
 	metadata *fastjson.Object
 }
@@ -22,7 +23,10 @@ func IsObject(def *fastjson.Value) bool {
 }
 
 func ParseObject(def *fastjson.Value) (ObjectNode, error) {
-	node := ObjectNode{}
+	node := ObjectNode{
+		Nullable: def.GetBool("nullable"),
+		metadata: def.GetObject("metadata"),
+	}
 
 	props_def := def.GetObject("properties")
 	if props_def != nil {

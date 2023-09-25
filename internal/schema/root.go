@@ -7,18 +7,27 @@ import (
 )
 
 type RootSchema struct {
+	Id string
 	Schema
-	Defs map[string]Schema
+	defs map[string]Schema
 }
 
 func FromDocument(node parser.DocumentNode) RootSchema {
+	schema_id_bytes, _ := node.Metadata("schemaId").StringBytes()
+	schema_id := string(schema_id_bytes)
+
+	ctx := SchemaContext{
+		SchemaId: schema_id,
+	}
+
 	schema := RootSchema{
-		Schema: From(node.Root),
-		Defs:   make(map[string]Schema, len(node.Definitions)),
+		Schema: From(ctx, node.Root),
+		Id:     string(schema_id),
+		defs:   make(map[string]Schema, len(node.Definitions)),
 	}
 
 	for def_name, def_node := range node.Definitions {
-		schema.Defs[def_name] = From(def_node.Value)
+		schema.defs[def_name] = From(ctx, def_node.Value)
 	}
 
 	return schema
@@ -26,7 +35,12 @@ func FromDocument(node parser.DocumentNode) RootSchema {
 
 func (schema RootSchema) MarshalJSON() ([]byte, error) {
 	root := make(map[string]interface{})
-	root["$defs"] = schema.Defs
+
+	if schema.Id != "" {
+		root["$id"] = schema.Id
+	}
+
+	root["$defs"] = schema.defs
 
 	base, err := json.Marshal(schema.Schema)
 	if err != nil {

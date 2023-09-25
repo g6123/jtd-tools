@@ -8,6 +8,7 @@ import (
 type DiscriminatedUnionNode struct {
 	Disciriminator string
 	Mapping        map[string]DiscriminatedVariantNode
+	Nullable       bool
 
 	metadata *fastjson.Object
 }
@@ -24,6 +25,7 @@ func IsDiscriminatedUnion(def *fastjson.Value) bool {
 func ParseDiscriminatedUnion(def *fastjson.Value) (DiscriminatedUnionNode, error) {
 	node := DiscriminatedUnionNode{
 		Disciriminator: string(def.GetStringBytes("discriminator")),
+		Nullable:       def.GetBool("nullable"),
 		metadata:       def.GetObject("metadata"),
 	}
 

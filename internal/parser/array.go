@@ -3,7 +3,8 @@ package parser
 import "github.com/valyala/fastjson"
 
 type ArrayNode struct {
-	Element Node
+	Element  Node
+	Nullable bool
 
 	metadata *fastjson.Object
 }
@@ -14,8 +15,9 @@ func IsArray(def *fastjson.Value) bool {
 
 func ParseArray(def *fastjson.Value) (ArrayNode, error) {
 	element, err := Parse(def.Get("elements"))
+	nullable := def.GetBool("nullable")
 	metadata := def.GetObject("metadata")
-	return ArrayNode{element, metadata}, err
+	return ArrayNode{element, nullable, metadata}, err
 }
 
 func (node ArrayNode) Metadata(key string) *fastjson.Value {

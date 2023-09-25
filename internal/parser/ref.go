@@ -3,7 +3,8 @@ package parser
 import "github.com/valyala/fastjson"
 
 type RefNode struct {
-	Name string
+	Name     string
+	Nullable bool
 
 	metadata *fastjson.Object
 }
@@ -14,8 +15,9 @@ func IsRef(def *fastjson.Value) bool {
 
 func ParseRef(def *fastjson.Value) (RefNode, error) {
 	name := string(def.GetStringBytes("ref"))
+	nullable := def.GetBool("nullable")
 	metadata := def.GetObject("metadata")
-	return RefNode{name, metadata}, nil
+	return RefNode{name, nullable, metadata}, nil
 }
 
 func (node RefNode) Metadata(key string) *fastjson.Value {

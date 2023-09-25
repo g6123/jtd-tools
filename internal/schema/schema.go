@@ -8,32 +8,44 @@ type Schema interface{}
 
 type AnySchema struct{}
 
-func From(node parser.Node) Schema {
+type AnyOfSchema struct {
+	AnyOf []Schema `json:"anyOf"`
+}
+
+type ConstSchema struct {
+	Const string `json:"const"`
+}
+
+func From(ctx SchemaContext, node parser.Node) Schema {
 	switch typed_node := node.(type) {
 	case parser.DocumentNode:
 		return FromDocument(typed_node)
 
 	case parser.ObjectNode:
-		return FromObject(typed_node)
+		return FromObject(ctx, typed_node)
 
 	case parser.DiscriminatedUnionNode:
-		return FromDiscriminatedUnion(typed_node)
+		return FromDiscriminatedUnion(ctx, typed_node)
 
 	case parser.RecordNode:
-		return FromRecord(typed_node)
+		return FromRecord(ctx, typed_node)
 
 	case parser.ArrayNode:
-		return FromArray(typed_node)
+		return FromArray(ctx, typed_node)
 
 	case parser.EnumNode:
-		return FromEnum(typed_node)
+		return FromEnum(ctx, typed_node)
 
 	case parser.RefNode:
-		return FromRef(typed_node)
+		return FromRef(ctx, typed_node)
 
 	case parser.PrimitiveNode:
-		return FromPrimitive(typed_node)
+		return FromPrimitive(ctx, typed_node)
 	}
 
 	return AnySchema{}
+}
+
+func NewNullableSchema(schema Schema) Schema {
+	return AnyOfSchema{[]Schema{schema, BasicSchema{Type: "null"}}}
 }

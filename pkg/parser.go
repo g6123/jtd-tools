@@ -4,7 +4,6 @@ import (
 	"os"
 
 	"github.com/g6123/jtd-tools/internal/parser"
-	"github.com/g6123/jtd-tools/internal/schema"
 	"github.com/valyala/fastjson"
 )
 
@@ -25,8 +24,4 @@ func ParseBytes(bytes []byte) (*parser.DocumentNode, error) {
 
 	doc, err := parser.ParseDocument(value)
 	return &doc, err
-}
-
-func ToSchema(doc parser.DocumentNode) schema.RootSchema {
-	return schema.FromDocument(doc)
 }
